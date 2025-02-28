@@ -1,0 +1,19 @@
+{
+    "code_appli_1": {
+        "consigne_x": [
+            "JobID_1A",
+            "JobID_1B"
+        ],
+        "consigne_y": [
+            "JobID_1C"
+        ]
+    },
+    "code_appli_2": {
+        "consigne_z": [
+            "JobID_2A"
+        ],
+        "null": [
+            "JobID_2B"
+        ]
+    }
+}

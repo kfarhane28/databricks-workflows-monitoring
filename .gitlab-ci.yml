@@ -1,0 +1,69 @@
+cache:
+  key: "$CI_PROJECT_PATH-$CI_COMMIT_REF_SLUG"
+  paths: []
+
+workflow:  
+  rules:
+    - if: $CI_COMMIT_BRANCH != "main" && $CI_PIPELINE_SOURCE != "merge_request_event"
+      when: never
+    - when: always
+
+variables:
+  OUTPUT_FILE: "jobs_par_code_appli.json"
+  TF_ROOT: "${CI_PROJECT_DIR}/infrastructure"
+  TF_CLI_ARGS_plan: "-var-file=environments/$ENVIRONMENT.tfvars"
+  ENVIRONMENT:
+    value: di-1
+    description: "Environnement cible à livrer"
+    options:
+      - di-1
+      - rc-1
+      - pr-1
+
+default:
+  tags: 
+    - iac-pfa
+
+stages:
+  - prepare_data
+  - validate
+  - test
+  - build
+  - deploy
+
+image:
+  name: "$CI_TEMPLATE_REGISTRY_HOST/xd7/terraform-1.9:0.0.5"
+
+fetch_data:
+  stage: prepare_data
+  image: python:3.9
+  cache: []
+  before_script:
+    - echo "🔧 Fusion de la variable NO_PROXY..."
+    - export no_proxy="${no_proxy},.azuredatabricks.net,*.serv.cdc.fr"
+    - echo "🔧 Désactivation du proxy pour éviter les erreurs 403..."
+    - echo "🔧 Configuration du repository PyPi Artifactory..."
+    - pip config set global.index-url "https://artifactory.serv.cdc.fr/artifactory/api/pypi/pypi-repo/simple"
+    - pip config set global.trusted-host "artifactory.serv.cdc.fr"
+    - env | grep ARM_
+    - env | grep DATABRICKS
+    - env | grep -i proxy
+  script:
+    - echo "📥 Installation des dépendances depuis Artifactory..."
+    - pip install requests
+    - pip install databricks-sdk
+    - echo "🚀 Exécution du script Python pour récupérer les jobs Databricks..."
+    - python scripts/fetch_databricks_jobs.py
+    - echo "📤 Déplacement du fichier JSON dans le répertoire Terraform..."
+    - mkdir -p $TF_ROOT/environments
+    - mv ${OUTPUT_FILE} $TF_ROOT/environments/jobs_par_code_appli.json
+    - echo "✅ Contenu du fichier :"
+    - cat $TF_ROOT/environments/jobs_par_code_appli.json
+  artifacts:
+    paths:
+      - $TF_ROOT/environments/jobs_par_code_appli.json  # 🔥 Sauvegarde à un endroit accessible
+    expire_in: 1 day
+
+include:
+  - project: 'iac/gitlab/pipelines'
+    file: '.terraform.yaml'

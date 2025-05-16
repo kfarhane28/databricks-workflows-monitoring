@@ -53,7 +53,7 @@ Add the following environment variables in **GitLab → Settings → CI/CD → V
 Define the following variables in your Terraform configuration files:
 
 - [`variables.tf`](./infrastructure/variables.tf)
-- [`di-1.tfvars`](./infrastructure/environments/dev.tfvars)
+- [`dev-1.tfvars`](./infrastructure/environments/dev.tfvars)
 
 #### Example: `dev.tfvars`
 

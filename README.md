@@ -53,13 +53,11 @@ Add the following environment variables in **GitLab → Settings → CI/CD → V
 Define the following variables in your Terraform configuration files:
 
 - [`variables.tf`](./infrastructure/variables.tf)
-- [`di-1.tfvars`](./infrastructure/environments/di-1.tfvars)
-- [`rc-1.tfvars`](./infrastructure/environments/rc-1.tfvars)
-- [`pr-1.tfvars`](./infrastructure/environments/pr-1.tfvars)
+- [`di-1.tfvars`](./infrastructure/environments/dev.tfvars)
 
-#### Example: `di-1.tfvars`
+#### Example: `dev.tfvars`
 
-The `di-1.tfvars` file should contain the following variables:
+The `dev.tfvars` file should contain the following variables:
 
 - `SUBSCRIPTION_ID_MAIN`: The subscription ID for the main deployment.
 - `zone`: The zone for the resource.
